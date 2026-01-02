@@ -118,10 +118,7 @@ class Domus {
   private startDemoMode(): void {
     // Set initial demo state
     const demoStates = new Map<string, HAEntityState>([
-      ['sensor.house_activity_state', createDemoEntity('sensor.house_activity_state', 'quiet')],
-      ['sensor.house_energy_state', createDemoEntity('sensor.house_energy_state', 'self_powered')],
-      ['sensor.house_energy_flow', createDemoEntity('sensor.house_energy_flow', 'balanced')],
-      ['sensor.house_comfort_state', createDemoEntity('sensor.house_comfort_state', 'neutral')],
+      ['sensor.house_activity_state', createDemoEntity('sensor.house_activity_state', 'one')],
       ['sensor.house_day_state', createDemoEntity('sensor.house_day_state', 'day')],
     ]);
     
@@ -131,20 +128,20 @@ class Domus {
     // Cycle through states for demonstration
     let demoIndex = 0;
     const demoSequence = [
+      // Day progression with one person
       { entity: 'sensor.house_day_state', state: 'twilight' },
-      { entity: 'sensor.house_activity_state', state: 'active' },
-      { entity: 'sensor.house_energy_flow', state: 'exporting' },
-      { entity: 'sensor.house_comfort_state', state: 'warm' },
+      { entity: 'sensor.house_activity_state', state: 'both' },
       { entity: 'sensor.house_day_state', state: 'night' },
-      { entity: 'sensor.house_activity_state', state: 'quiet' },
-      { entity: 'sensor.house_energy_flow', state: 'importing' },
-      { entity: 'sensor.house_energy_state', state: 'grid_dependent' },
+      // Night with both people
+      { entity: 'sensor.house_activity_state', state: 'one' },
+      // Back to day, one person
+      { entity: 'sensor.house_day_state', state: 'twilight' },
       { entity: 'sensor.house_day_state', state: 'day' },
-      { entity: 'sensor.house_activity_state', state: 'busy' },
-      { entity: 'sensor.house_energy_state', state: 'self_powered' },
-      { entity: 'sensor.house_energy_flow', state: 'balanced' },
-      { entity: 'sensor.house_comfort_state', state: 'neutral' },
+      // Empty house during day
       { entity: 'sensor.house_activity_state', state: 'empty' },
+      // Someone comes home
+      { entity: 'sensor.house_activity_state', state: 'one' },
+      { entity: 'sensor.house_activity_state', state: 'both' },
     ];
     
     setInterval(() => {
@@ -187,4 +184,3 @@ if (document.readyState === 'loading') {
   const app = new Domus();
   app.start();
 }
-

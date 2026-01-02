@@ -20,17 +20,8 @@ export interface DomusConfig {
 // House States (derived from Home Assistant)
 // =============================================================================
 
-/** Overall activity level in the home */
-export type ActivityState = 'empty' | 'quiet' | 'active' | 'busy';
-
-/** Energy independence state */
-export type EnergyState = 'self_powered' | 'mixed' | 'grid_dependent';
-
-/** Direction of energy flow */
-export type EnergyFlow = 'importing' | 'exporting' | 'balanced';
-
-/** Indoor comfort feeling */
-export type ComfortState = 'cold' | 'cool' | 'neutral' | 'warm' | 'hot';
+/** How many people are home */
+export type ActivityState = 'empty' | 'one' | 'both';
 
 /** Time of day state */
 export type DayState = 'day' | 'twilight' | 'night';
@@ -38,9 +29,6 @@ export type DayState = 'day' | 'twilight' | 'night';
 /** Complete house state snapshot */
 export interface HouseState {
   activity: ActivityState;
-  energy: EnergyState;
-  energyFlow: EnergyFlow;
-  comfort: ComfortState;
   dayState: DayState;
   
   /** Timestamp of last update */
@@ -52,10 +40,7 @@ export interface HouseState {
 
 /** Default/neutral house state for initialization and fallback */
 export const DEFAULT_HOUSE_STATE: HouseState = {
-  activity: 'quiet',
-  energy: 'mixed',
-  energyFlow: 'balanced',
-  comfort: 'neutral',
+  activity: 'empty',
   dayState: 'day',
   lastUpdated: 0,
   connected: false,
@@ -128,17 +113,6 @@ export interface Point {
   y: number;
 }
 
-/** An animated particle for energy visualization */
-export interface Particle {
-  id: string;
-  position: Point;
-  velocity: Point;
-  opacity: number;
-  type: 'import' | 'export' | 'internal';
-  age: number;
-  maxAge: number;
-}
-
 /** A presence pulse animation */
 export interface Pulse {
   id: string;
@@ -150,40 +124,9 @@ export interface Pulse {
   duration: number;
 }
 
-/** Current visual state being rendered */
-export interface VisualState {
-  /** Current background state */
-  background: DayState;
-  
-  /** Active particles */
-  particles: Particle[];
-  
-  /** Active pulses */
-  pulses: Pulse[];
-  
-  /** Comfort overlay opacity and type */
-  comfort: {
-    type: 'none' | 'cold' | 'warm' | 'hot';
-    opacity: number;
-  };
-  
-  /** House line color (interpolated) */
-  lineColor: string;
-}
-
 // =============================================================================
 // Transition Types
 // =============================================================================
 
-/** An ongoing transition between values */
-export interface Transition<T> {
-  from: T;
-  to: T;
-  startTime: number;
-  duration: number;
-  easing: (t: number) => number;
-}
-
 /** Easing functions */
 export type EasingFunction = (t: number) => number;
-

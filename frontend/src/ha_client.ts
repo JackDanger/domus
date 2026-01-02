@@ -55,9 +55,6 @@ const MAX_RECONNECT_DELAY = 60000;
 /** Entities we care about - only subscribe to these */
 const WATCHED_ENTITIES = [
   'sensor.house_activity_state',
-  'sensor.house_energy_state',
-  'sensor.house_energy_flow',
-  'sensor.house_comfort_state',
   'sensor.house_day_state',
 ];
 

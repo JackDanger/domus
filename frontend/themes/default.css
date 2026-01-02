@@ -25,17 +25,7 @@
   
   /* Presence pulse colors */
   --pulse-color: rgba(180, 160, 140, 0.25);
-  --pulse-color-active: rgba(200, 180, 160, 0.35);
-  
-  /* Energy particle colors */
-  --particle-import: rgba(100, 140, 180, 0.6);
-  --particle-export: rgba(180, 160, 100, 0.6);
-  --particle-self: rgba(140, 160, 140, 0.4);
-  
-  /* Comfort effect colors */
-  --comfort-cold: rgba(140, 160, 180, 0.15);
-  --comfort-warm: rgba(200, 150, 100, 0.25);
-  --comfort-hot: rgba(220, 140, 80, 0.35);
+  --pulse-color-both: rgba(200, 180, 160, 0.35);
   
   /* Timing */
   --transition-fast: 1s;
@@ -184,8 +174,6 @@ body {
   fill: var(--pulse-color);
   opacity: 0;
   transform-origin: center;
-  
-  /* Pulses animate via JavaScript */
 }
 
 @keyframes pulse-expand {
@@ -197,52 +185,6 @@ body {
     transform: scale(1.5);
     opacity: 0;
   }
-}
-
-/* =========================================================================
-   Energy Particles
-   ========================================================================= */
-
-.energy-particle {
-  r: 2.5;
-  opacity: 0;
-  
-  /* Particles animate via JavaScript */
-}
-
-.energy-particle.importing {
-  fill: var(--particle-import);
-}
-
-.energy-particle.exporting {
-  fill: var(--particle-export);
-}
-
-.energy-particle.self-powered {
-  fill: var(--particle-self);
-}
-
-/* =========================================================================
-   Comfort Effects
-   ========================================================================= */
-
-#comfort-layer {
-  opacity: 0;
-  transition: opacity var(--transition-slow) var(--ease-calm);
-}
-
-#comfort-layer.active {
-  opacity: 1;
-}
-
-.floor-glow {
-  fill: var(--comfort-warm);
-  filter: url(#warm-glow);
-}
-
-.cold-overlay {
-  fill: var(--comfort-cold);
-  mix-blend-mode: multiply;
 }
 
 /* =========================================================================
@@ -335,4 +277,3 @@ body {
     --line-width: 3px;
   }
 }
-

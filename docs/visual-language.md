@@ -38,35 +38,12 @@ Transitions between states take 30-60 seconds. The eye barely notices the change
 When someone is home, soft circular pulses emanate from within the house.
 
 - **Empty**: No pulses, complete stillness
-- **Quiet**: Rare, slow pulses (every 30s), low opacity
-- **Active**: Gentle pulses (every 15s), moderate opacity  
-- **Busy**: More frequent pulses (every 8s), slightly larger
+- **One person home**: Gentle, occasional pulses (every ~20s)
+- **Both people home**: More frequent pulses (every ~10s), slightly larger
 
 Pulses grow from the center outward and fade, like ripples in still water. They are never sharp, never demanding.
 
-### Energy Flow Particles
-
-Tiny dots move along invisible paths to show energy flow.
-
-- **Self-powered**: No particles, or occasional internal circulation
-- **Mixed**: Slow particles drifting inward (import) or outward (export)
-- **Grid-dependent**: Steady stream of particles flowing inward
-
-Particles are small (2-3px), slow-moving, and low-opacity. They suggest flow rather than demand attention.
-
-### Comfort Indicators
-
-Temperature state is conveyed through subtle ambient effects.
-
-| State   | Visual Effect                                        |
-|---------|-----------------------------------------------------|
-| Cold    | Slight blue tinge to house line                     |
-| Cool    | Subtle cool undertone                               |
-| Neutral | No additional effect                                |
-| Warm    | Gentle amber glow from floor area                   |
-| Hot     | Stronger amber glow, faint heat shimmer             |
-
-The comfort effect is always the subtlest layer — it tints the mood without dominating.
+The intensity of pulses (size and opacity) increases when both people are home, creating a subtle sense of fullness.
 
 ## Color Palette
 
@@ -74,7 +51,7 @@ The palette is muted and earthy. No pure whites, no saturated colors.
 
 ```css
 /* Background */
---bg-day:      #e8e4df;
+--bg-day:      #d8d4cf;
 --bg-twilight: #6b5a4f;
 --bg-night:    #1a1a1f;
 
@@ -83,15 +60,8 @@ The palette is muted and earthy. No pure whites, no saturated colors.
 --line-night:    #5a5a60;
 
 /* Presence */
---pulse-color:   rgba(180, 160, 140, 0.3);
-
-/* Energy */
---particle-in:   rgba(100, 140, 180, 0.5);
---particle-out:  rgba(180, 140, 100, 0.5);
-
-/* Comfort */
---comfort-cold:  rgba(140, 160, 180, 0.2);
---comfort-warm:  rgba(180, 140, 100, 0.3);
+--pulse-color:   rgba(180, 160, 140, 0.25);
+--pulse-color-both: rgba(200, 180, 160, 0.35);
 ```
 
 ## Animation Principles
@@ -102,25 +72,23 @@ All animations are slow:
 - Minimum transition duration: 2 seconds
 - State changes: 3-5 seconds
 - Background transitions: 30-60 seconds
-- Particle movement: 10-20 seconds per screen width
+- Pulse duration: 8 seconds
 
 ### Easing
 
 Use gentle easing functions:
 - `ease-in-out` for most transitions
-- Linear for particle movement
 - Custom easing for organic effects
 
 ### Stillness
 
-The default state is stillness. If no state changes are happening, the display should be nearly static — just enough subtle breathing to avoid looking frozen.
+The default state is stillness. If no one is home, the display should be nearly static — just enough subtle life to avoid looking frozen (the slow background gradient shift provides this).
 
 ## Missing Data States
 
 When data is unavailable:
-- Affected elements fade to neutral (50% opacity of neutral state)
-- No error indicators, no alerts
 - The house remains calm and complete
+- No error indicators, no alerts
 - Transitions out of missing data are gentle (5+ seconds)
 
 ## Screen Boundaries
@@ -131,4 +99,3 @@ The house sits centered with generous margins:
 - The house should feel like it has room to breathe
 
 On the 7" Pi display (800×480), the house drawing occupies roughly the center 70% of the screen.
-

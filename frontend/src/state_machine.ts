@@ -15,9 +15,6 @@
 import type {
   HouseState,
   ActivityState,
-  EnergyState,
-  EnergyFlow,
-  ComfortState,
   DayState,
   HAEntityState,
 } from './types';
@@ -34,10 +31,7 @@ type StateChangeListener = (newState: HouseState, previousState: HouseState) => 
 // Valid State Values
 // =============================================================================
 
-const VALID_ACTIVITY: ActivityState[] = ['empty', 'quiet', 'active', 'busy'];
-const VALID_ENERGY: EnergyState[] = ['self_powered', 'mixed', 'grid_dependent'];
-const VALID_ENERGY_FLOW: EnergyFlow[] = ['importing', 'exporting', 'balanced'];
-const VALID_COMFORT: ComfortState[] = ['cold', 'cool', 'neutral', 'warm', 'hot'];
+const VALID_ACTIVITY: ActivityState[] = ['empty', 'one', 'both'];
 const VALID_DAY: DayState[] = ['day', 'twilight', 'night'];
 
 // =============================================================================
@@ -108,15 +102,6 @@ export class StateMachine {
       case 'sensor.house_activity_state':
         return this.parseActivity(value);
         
-      case 'sensor.house_energy_state':
-        return this.parseEnergy(value);
-        
-      case 'sensor.house_energy_flow':
-        return this.parseEnergyFlow(value);
-        
-      case 'sensor.house_comfort_state':
-        return this.parseComfort(value);
-        
       case 'sensor.house_day_state':
         return this.parseDayState(value);
         
@@ -130,30 +115,6 @@ export class StateMachine {
       return { activity: value };
     }
     console.warn(`[StateMachine] Invalid activity state: ${value}`);
-    return {};
-  }
-  
-  private parseEnergy(value: string): Partial<HouseState> {
-    if (isValidEnergy(value)) {
-      return { energy: value };
-    }
-    console.warn(`[StateMachine] Invalid energy state: ${value}`);
-    return {};
-  }
-  
-  private parseEnergyFlow(value: string): Partial<HouseState> {
-    if (isValidEnergyFlow(value)) {
-      return { energyFlow: value };
-    }
-    console.warn(`[StateMachine] Invalid energy flow: ${value}`);
-    return {};
-  }
-  
-  private parseComfort(value: string): Partial<HouseState> {
-    if (isValidComfort(value)) {
-      return { comfort: value };
-    }
-    console.warn(`[StateMachine] Invalid comfort state: ${value}`);
     return {};
   }
   
@@ -196,19 +157,6 @@ function isValidActivity(value: string): value is ActivityState {
   return VALID_ACTIVITY.includes(value as ActivityState);
 }
 
-function isValidEnergy(value: string): value is EnergyState {
-  return VALID_ENERGY.includes(value as EnergyState);
-}
-
-function isValidEnergyFlow(value: string): value is EnergyFlow {
-  return VALID_ENERGY_FLOW.includes(value as EnergyFlow);
-}
-
-function isValidComfort(value: string): value is ComfortState {
-  return VALID_COMFORT.includes(value as ComfortState);
-}
-
 function isValidDayState(value: string): value is DayState {
   return VALID_DAY.includes(value as DayState);
 }
-
