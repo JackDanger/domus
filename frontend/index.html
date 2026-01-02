@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a1f">
+  
+  <!-- Prevent screen sleep on mobile/kiosk -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  <title>Domus</title>
+  
+  <!-- Preload critical font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link rel="stylesheet" href="./themes/default.css">
+  
+  <!-- Configuration (gitignored, must be created locally) -->
+  <script src="./config.js"></script>
+</head>
+<body>
+  <div id="domus">
+    <!-- Background gradient layer -->
+    <div id="background"></div>
+    
+    <!-- Main SVG canvas for house and effects -->
+    <svg id="house-canvas" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet">
+      <!-- Definitions for gradients, filters, and reusable elements -->
+      <defs>
+        <!-- Soft glow filter for presence pulses -->
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        
+        <!-- Warm floor glow filter -->
+        <filter id="warm-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="12" result="blur"/>
+          <feColorMatrix type="matrix" in="blur" result="warm"
+            values="1.2 0 0 0 0.1
+                    0 0.9 0 0 0.05
+                    0 0 0.7 0 0
+                    0 0 0 0.8 0"/>
+          <feMerge>
+            <feMergeNode in="warm"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        
+        <!-- Cold tint filter -->
+        <filter id="cold-tint" x="-50%" y="-50%" width="200%" height="200%">
+          <feColorMatrix type="matrix"
+            values="0.9 0 0 0 0
+                    0 0.95 0 0 0.02
+                    0 0 1.1 0 0.05
+                    0 0 0 1 0"/>
+        </filter>
+      </defs>
+      
+      <!-- Layer: Comfort effects (floor glow, cold tint) -->
+      <g id="comfort-layer"></g>
+      
+      <!-- Layer: Energy particles -->
+      <g id="energy-layer"></g>
+      
+      <!-- Layer: The house drawing -->
+      <g id="house-layer"></g>
+      
+      <!-- Layer: Presence pulses -->
+      <g id="presence-layer"></g>
+    </svg>
+    
+    <!-- Connection status indicator (only visible when disconnected) -->
+    <div id="connection-status" class="hidden">
+      <span class="dot"></span>
+    </div>
+  </div>
+  
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
+

@@ -1,0 +1,257 @@
+# Domus Template Sensors for Home Assistant
+# 
+# These sensors derive high-level house states from raw entity data.
+# The Domus frontend reads only these derived states, keeping the
+# frontend simple and logic-free.
+#
+# INSTALLATION:
+# 1. Copy this file to your Home Assistant config directory
+# 2. Add the following to your configuration.yaml:
+#
+#    template: !include template_sensors.yaml
+#
+# 3. Restart Home Assistant
+# 4. Verify sensors appear in Developer Tools → States
+#
+# CUSTOMIZATION:
+# Update entity_id references to match your actual devices.
+# The default entities are placeholders.
+
+- sensor:
+    # =========================================================================
+    # HOUSE ACTIVITY STATE
+    # =========================================================================
+    # Combines presence detection and motion sensors to determine
+    # overall activity level in the home.
+    #
+    # States: empty | quiet | active | busy
+    #
+    - name: "House Activity State"
+      unique_id: domus_house_activity_state
+      state: >
+        {% set you_home = is_state('person.you', 'home') %}
+        {% set partner_home = is_state('person.partner', 'home') %}
+        {% set anyone_home = you_home or partner_home %}
+        
+        {# Count recent motion events - adjust entity_ids to match your sensors #}
+        {% set motion_sensors = [
+          'binary_sensor.simplisafe_motion_living_room',
+          'binary_sensor.simplisafe_motion_bedroom',
+          'binary_sensor.simplisafe_motion_office'
+        ] %}
+        
+        {% set motion_count = motion_sensors | select('is_state', 'on') | list | count %}
+        
+        {% if not anyone_home %}
+          empty
+        {% elif motion_count >= 2 %}
+          busy
+        {% elif motion_count == 1 %}
+          active
+        {% else %}
+          quiet
+        {% endif %}
+      icon: >
+        {% if this.state == 'empty' %}
+          mdi:home-outline
+        {% elif this.state == 'busy' %}
+          mdi:home-alert
+        {% else %}
+          mdi:home
+        {% endif %}
+
+    # =========================================================================
+    # HOUSE ENERGY STATE
+    # =========================================================================
+    # Determines energy independence based on Tesla Powerwall status.
+    #
+    # States: self_powered | mixed | grid_dependent
+    #
+    - name: "House Energy State"
+      unique_id: domus_house_energy_state
+      state: >
+        {# Tesla Powerwall entities - adjust to match your installation #}
+        {% set battery_level = states('sensor.powerwall_charge') | float(50) %}
+        {% set grid_power = states('sensor.powerwall_site_now') | float(0) %}
+        {% set solar_power = states('sensor.powerwall_solar_now') | float(0) %}
+        
+        {# Positive grid_power = importing, negative = exporting #}
+        {% set importing = grid_power > 100 %}
+        {% set exporting = grid_power < -100 %}
+        
+        {% if battery_level > 20 and not importing %}
+          self_powered
+        {% elif importing and grid_power > 500 %}
+          grid_dependent
+        {% else %}
+          mixed
+        {% endif %}
+      icon: >
+        {% if this.state == 'self_powered' %}
+          mdi:solar-power
+        {% elif this.state == 'grid_dependent' %}
+          mdi:transmission-tower
+        {% else %}
+          mdi:solar-power-variant
+        {% endif %}
+
+    # =========================================================================
+    # HOUSE COMFORT STATE  
+    # =========================================================================
+    # Maps indoor temperature to a comfort feeling.
+    #
+    # States: cold | cool | neutral | warm | hot
+    #
+    # Thresholds (Fahrenheit):
+    #   cold:    < 64°F
+    #   cool:    64-68°F  
+    #   neutral: 68-74°F
+    #   warm:    74-78°F
+    #   hot:     > 78°F
+    #
+    - name: "House Comfort State"
+      unique_id: domus_house_comfort_state
+      state: >
+        {# Indoor temperature sensor - adjust entity_id to match yours #}
+        {% set temp = states('sensor.indoor_temperature') | float(70) %}
+        
+        {% if temp < 64 %}
+          cold
+        {% elif temp < 68 %}
+          cool
+        {% elif temp <= 74 %}
+          neutral
+        {% elif temp <= 78 %}
+          warm
+        {% else %}
+          hot
+        {% endif %}
+      icon: >
+        {% if this.state in ['cold', 'cool'] %}
+          mdi:snowflake
+        {% elif this.state in ['warm', 'hot'] %}
+          mdi:fire
+        {% else %}
+          mdi:thermometer
+        {% endif %}
+
+    # =========================================================================
+    # HOUSE DAY STATE
+    # =========================================================================
+    # Derives time-of-day state from the sun entity.
+    #
+    # States: day | night | twilight
+    #
+    - name: "House Day State"
+      unique_id: domus_house_day_state
+      state: >
+        {% set sun_state = states('sun.sun') %}
+        {% set elevation = state_attr('sun.sun', 'elevation') | float(0) %}
+        
+        {# Twilight is defined as sun elevation between -6° and 6° #}
+        {% if sun_state == 'below_horizon' %}
+          {% if elevation > -6 %}
+            twilight
+          {% else %}
+            night
+          {% endif %}
+        {% else %}
+          {% if elevation < 6 %}
+            twilight
+          {% else %}
+            day
+          {% endif %}
+        {% endif %}
+      icon: >
+        {% if this.state == 'day' %}
+          mdi:weather-sunny
+        {% elif this.state == 'night' %}
+          mdi:weather-night
+        {% else %}
+          mdi:weather-sunset
+        {% endif %}
+
+    # =========================================================================
+    # ENERGY FLOW DIRECTION (Optional helper)
+    # =========================================================================
+    # Provides more granular energy flow information for particle animation.
+    #
+    # States: importing | exporting | balanced
+    #
+    - name: "House Energy Flow"
+      unique_id: domus_house_energy_flow
+      state: >
+        {% set grid_power = states('sensor.powerwall_site_now') | float(0) %}
+        
+        {% if grid_power > 100 %}
+          importing
+        {% elif grid_power < -100 %}
+          exporting
+        {% else %}
+          balanced
+        {% endif %}
+      attributes:
+        flow_intensity: >
+          {% set grid_power = states('sensor.powerwall_site_now') | float(0) | abs %}
+          {% if grid_power > 2000 %}
+            high
+          {% elif grid_power > 500 %}
+            medium
+          {% else %}
+            low
+          {% endif %}
+
+
+# =============================================================================
+# PLACEHOLDER SENSORS (for development/testing)
+# =============================================================================
+# If you don't have all the real sensors yet, uncomment these input_select
+# helpers to manually test different states in Domus.
+#
+# Add to configuration.yaml:
+#
+# input_select:
+#   domus_test_activity:
+#     name: "Test Activity State"
+#     options:
+#       - empty
+#       - quiet
+#       - active
+#       - busy
+#     initial: quiet
+#
+#   domus_test_energy:
+#     name: "Test Energy State"
+#     options:
+#       - self_powered
+#       - mixed
+#       - grid_dependent
+#     initial: self_powered
+#
+#   domus_test_comfort:
+#     name: "Test Comfort State"
+#     options:
+#       - cold
+#       - cool
+#       - neutral
+#       - warm
+#       - hot
+#     initial: neutral
+#
+#   domus_test_day:
+#     name: "Test Day State"
+#     options:
+#       - day
+#       - twilight
+#       - night
+#     initial: day
+#
+# Then create template sensors that mirror these for testing:
+#
+# - sensor:
+#     - name: "House Activity State"
+#       unique_id: domus_house_activity_state
+#       state: "{{ states('input_select.domus_test_activity') }}"
+#
+# etc.
+
