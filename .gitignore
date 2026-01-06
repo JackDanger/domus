@@ -3,9 +3,7 @@ node_modules/
 
 # Build output
 dist/
-
-# Configuration (contains secrets)
-frontend/config.js
+kiosk.html
 
 # Editor directories and files
 .idea/

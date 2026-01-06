@@ -7,6 +7,7 @@ export default defineConfig({
     outDir: '../dist',
     emptyOutDir: true,
   },
+  base: './', // Use relative paths for file:// protocol compatibility
   resolve: {
     alias: {
       '@': resolve(__dirname, 'frontend/src'),

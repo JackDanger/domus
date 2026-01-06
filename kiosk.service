@@ -1,0 +1,31 @@
+# /etc/systemd/system/kiosk.service
+[Unit]
+Description=Domus Kiosk
+After=systemd-user-sessions.service
+After=graphical.target
+Wants=graphical.target
+
+[Service]
+User=pi
+Group=pi
+
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+
+PAMName=login
+
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WAYLAND_DISPLAY=wayland-0
+
+ExecStart=/home/pi/kiosk.sh
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target
